@@ -5,11 +5,14 @@
 #include "solve_tools.h"
 #include "pictures_prata.h"
 #include "test_prata.h"
+#include "file_func.h"
 
 void pager              (void);
 void input_ratio        (double* a, double* b, double* c, int* scanf_succ);
 void output             (int* ch, int* quantity_s, int* scanf_succ, double* x1, double* x2);
 void output_key         (int quantity_s, double x1, double x2);
+void input_ratio_file   (double* a, double* b, double* c, int* scanf_succ, int* ch, FILE* fp);
+void solve_file         (double a, double b, double c, double* x1, double* x2, int* quantity_s, int scanf_succ, int* ch, FILE* fp);
 
 int main(void)
 {
@@ -25,6 +28,30 @@ int main(void)
     test_k = run_tests();
     if (test_k == e_test_bad)
         return -1;
+
+    printf("Enter \"F\" to start file input (inputfile.txt) or anything to continue\n");
+    if (getchar() == 'F')
+    {
+        FILE* fp = fopen("inputfile.txt", "r");
+
+        input_ratio_file(&a, &b, &c, &scanf_succ, &ch, fp);
+
+        while (ch != EOF)
+        {
+            ch = getc(fp);
+
+            solve_file(a, b, c, &x1, &x2, &quantity_s, scanf_succ, &ch, fp);
+
+            output_file(&ch, &quantity_s, &scanf_succ, &x1, &x2, fp);
+
+            input_ratio_file(&a, &b, &c, &scanf_succ, &ch, fp);
+        }
+
+        fclose(fp);
+    }
+
+    while (getchar() != '\n')
+        continue;
 
     input_ratio(&a, &b, &c, &scanf_succ);
 
@@ -50,10 +77,10 @@ void pager(void)
 
 void input_ratio(double* a, double* b, double* c, int* scanf_succ)
 {
-    assert(a != NULL);
-    assert(b != NULL);
-    assert(c != NULL);
-    assert(scanf_succ != NULL);
+    assert(a);
+    assert(b);
+    assert(c);
+    assert(scanf_succ);
     assert(a != b);
     assert(a != c);
     assert(b != c);
